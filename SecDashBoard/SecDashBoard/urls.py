@@ -24,6 +24,7 @@ from homepage.views import loginout
 urlpatterns = [
     path('',views.loginPage,name='loginpage'),
     path('dashboard/',include('homepage.urls')),
+    
     path('logout/',loginout,name='loginout'),
     path('admin/clearcache/', include('clearcache.urls')),
     path('admin/', admin.site.urls),

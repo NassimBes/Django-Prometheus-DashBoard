@@ -2,11 +2,11 @@
 
 {% block dropdowntag %}
 <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Actions</a>
     <div class="dropdown-menu">
-      <a class="dropdown-item" href="#">Action</a>
-      <a class="dropdown-item" href="#">Another action</a>
-      <a class="dropdown-item" href="addServer/">Something else here</a>
+      {% comment %} <a class="dropdown-item" href="#">Action</a>
+      <a class="dropdown-item" href="#">Another action</a> {% endcomment %}
+      <a class="dropdown-item" href="addServer/">Add Server</a>
       <div class="dropdown-divider"></div>
       <a class="dropdown-item" href="/logout/">Logout</a>
     </div>
@@ -16,7 +16,7 @@
 
 {% block content %}
 
-    {% for elem in serverModels %}
+    {% for elem in PromServerModels %}
         {{elem.hostname}}
     {% endfor %}
 {% endblock content %}

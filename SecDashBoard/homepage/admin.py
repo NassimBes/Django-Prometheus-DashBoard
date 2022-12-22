@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import ServerModel
+from .models import PromServerModel,ServerInfoModel
 # Register your models here.
 
 
-admin.site.register(ServerModel)
+admin.site.register(PromServerModel)
+admin.site.register(ServerInfoModel)

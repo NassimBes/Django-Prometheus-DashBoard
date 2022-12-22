@@ -1,7 +1,7 @@
 from django import forms
-from .models import ServerModel
+from .models import PromServerModel
 
-class ServerModelForms(forms.ModelForm):
+class PromServerModelForms(forms.ModelForm):
     class Meta:
-        model = ServerModel
+        model = PromServerModel
         fields = ['hostname']
