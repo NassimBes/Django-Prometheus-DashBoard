@@ -21,8 +21,7 @@ def HomePage(request):
 
     if search_post:
         servModel = PromServerModel.objects.filter(
-            Q(hostname__icontains=search_post) & 
-            Q(ipAddress__icontains=search_post)
+            Q(hostname__icontains=search_post)
         )
     else:
         servModel = PromServerModel.objects.all()
@@ -40,19 +39,19 @@ def ServerFormView(request):
         form = PromServerModelForms(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
+            
             if ItemExist(instance.hostname):
-                return render(request,'homepage/AddServerForm.html',{'form':form})
+                return redirect("server_info_form")
             else:
-                try:
-                    socket.gethostbyname(instance.hostname)
-                    
-                except socket.gaierror:
-                    return render(request,'homepage/AddServerForm.html',{
-                            'form' : form,
-                        })
-                else:
-                    instance.ipAddress = socket.gethostbyname(instance.hostname)
-                    GET_REQUEST_PromCollect(instance.hostname,instance)
+                with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+                    try :
+                        if socket.gethostbyname(instance.hostname) and sock.connect_ex((instance.hostname, 9090)) != 0:
+                            return redirect("server_info_form")
+                    except socket.gaierror:
+                        return redirect("server_info_form")
+
+                instance.ipAddress = socket.gethostbyname(instance.hostname)
+                GET_REQUEST_PromCollect(instance.hostname,instance)
                 instance.save()
                 PromServerModel = form.save()
                 return redirect("homepage")
@@ -64,35 +63,26 @@ def ServerFormView(request):
 
 
 def ItemExist(hostname):
-    for obj in PromServerModel.objects.all():
-        if obj.hostname ==  hostname:
-            return True
-    return False
+        for obj in PromServerModel.objects.all():
+            if obj.hostname ==  hostname:
+                return True
+        return False
 
 def GET_REQUEST_PromCollect(hostname,instance):
     try:
-        with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-            if sock.connect_ex((hostname, 9090)) == 0:
-                try:
-                    r = requests.get(f"http://{socket.gethostbyname(hostname)}:9090/api/v1/targets")
-                except requests.ConnectionError:
-                    return redirect('homepage')
-                else:
-                    for elem in r.json()['data']['activeTargets']:
-                        instance.activeTargets.append("".join(elem['discoveredLabels']['__address__'].split(':')[0]))
-                    
-                    for elem in r.json()['data']['droppedTargets']:
-                        if elem:
-                            instance.droppedTargets.append("".join(elem['discoveredLabels']['__address__'].split(':')[0]))
-                    #     (state=True if elem['health']=='up' else False,scrape_duration=elem['discoveredLabels']['__scrape_interval__'])
-                    # servinf.save()
-            else:
-                raise Exception(socket.error)
-                return redirect('homepage')
-                
-    except socket.error:
+        r = requests.get(f"http://{socket.gethostbyname(hostname)}:9090/api/v1/targets")
+    except requests.ConnectionError:
         return redirect('homepage')
-
+    else:
+            for elem in r.json()['data']['activeTargets']:
+                instance.activeTargets.append("".join(elem['discoveredLabels']['__address__'].split(':')[0]))
+            
+            for elem in r.json()['data']['droppedTargets']:
+                if elem:
+                    instance.droppedTargets.append("".join(elem['discoveredLabels']['__address__'].split(':')[0]))
+            #     (state=True if elem['health']=='up' else False,scrape_duration=elem['discoveredLabels']['__scrape_interval__'])
+            # servinf.save()
+    
 @login_required(login_url='/login')
 def deleteRecord(request,id):
     host = PromServerModel.objects.get(id=id)
