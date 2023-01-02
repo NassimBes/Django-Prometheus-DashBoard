@@ -35,6 +35,8 @@ def HomePage(request):
 ##NEED TO BE REVIEWED
 @login_required(login_url='/login')
 def ServerFormView(request):
+    socket.setdefaulttimeout(0.01)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if request.method == "POST":
         form = PromServerModelForms(request.POST)
         if form.is_valid():
@@ -43,18 +45,19 @@ def ServerFormView(request):
             if ItemExist(instance.hostname):
                 return redirect("server_info_form")
             else:
-                with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-                    try :
-                        if socket.gethostbyname(instance.hostname) and sock.connect_ex((instance.hostname, 9090)) != 0:
-                            return redirect("server_info_form")
-                    except socket.gaierror:
+                try :
+                    if socket.gethostbyname(instance.hostname) and sock.connect_ex((instance.hostname, 9090)) == 0:
+                        instance.ipAddress = socket.gethostbyname(instance.hostname)
+                        GET_REQUEST_PromCollect(instance.hostname,instance)
+                        instance.save()
+                        PromServerModel = form.save()
+                        sock.close()
+                        return redirect("homepage")
+                    else:
                         return redirect("server_info_form")
-
-                instance.ipAddress = socket.gethostbyname(instance.hostname)
-                GET_REQUEST_PromCollect(instance.hostname,instance)
-                instance.save()
-                PromServerModel = form.save()
-                return redirect("homepage")
+                except socket.gaierror as e:
+                    sock.close()
+                    return redirect("server_info_form")
     else:
         form = PromServerModelForms()
     return render(request,'homepage/AddServerForm.html',{
