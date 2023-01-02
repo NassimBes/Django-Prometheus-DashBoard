@@ -23,5 +23,5 @@ import homepage.views as hviews
 urlpatterns = [
     path('',hviews.HomePage,name="homepage"),
     path('addServer/',hviews.ServerFormView,name="server_info_form"),
-
+    path('delete/<int:id>', hviews.deleteRecord, name='delete_record'),
 ]

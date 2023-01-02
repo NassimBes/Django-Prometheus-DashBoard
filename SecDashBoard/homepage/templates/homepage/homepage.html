@@ -18,6 +18,7 @@
 
     {% for elem in PromServerModels %}
         {{elem.hostname}}
+        <a href="delete/{{ elem.id }}">delete</a>
     {% endfor %}
 {% endblock content %}
 
