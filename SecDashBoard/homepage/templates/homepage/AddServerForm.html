@@ -3,7 +3,10 @@
 {% block content %}
     <form method="POST" action="">
         {% csrf_token %}
-        {{form.as_p}}
+        <p>
+            <label for="id_hostname">Hostname:</label>
+            <input type="text" name="hostname" maxlength="50" id="id_hostname" pattern="^[a-zA-Z.]+$" title="Domain Name">
+        </p>
         <button type="submit">Click</button>
     </form>
 {% endblock %}
