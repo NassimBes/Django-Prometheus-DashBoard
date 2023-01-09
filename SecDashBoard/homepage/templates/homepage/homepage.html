@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block dropdowntag %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Actions</a>
+    <div class="dropdown-menu">
+      {% comment %} <a class="dropdown-item" href="#">Action</a>
+      <a class="dropdown-item" href="#">Another action</a> {% endcomment %}
+      <a class="dropdown-item" href="addServer/">Add Server</a>
+      <div class="dropdown-divider"></div>
+      <a class="dropdown-item" href="/logout/">Logout</a>
+    </div>
+  </li>
+{% endblock dropdowntag %}
+
+
+{% block content %}
+
+    {% for elem in PromServerModels %}
+        {{elem.hostname}}
+        <a href="delete/{{ elem.id }}">delete</a>
+    {% endfor %}
+{% endblock content %}
+
+    
+
+
+

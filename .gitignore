@@ -3,9 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
+SecDashBoard/*/migrations/*
 # C extensions
 *.so
 
+*.sqlite3
+dashenv/
 # Distribution / packaging
 .Python
 build/
