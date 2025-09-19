@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  python:
+    build: ./bin/python
+    container_name: 'python'
+    command: ["python", "test.py"]
+    volumes:
+      - ./code:/code
+    links:
+      - prometheus
+    ports:
+      - '8021:8021'
+    networks:
+      - promdjangoproject
+
+
+  prometheus:
+    image: ubuntu/prometheus:2-24.04_stable
+    container_name: 'prometheus'
+    volumes:
+      - ./prometheus:/etc/prometheus
+    ports:
+      - '9090:9090'
+    networks:
+      - promdjangoproject
+        
+
+networks:
+  promdjangoproject:
+    driver: bridge
+      
